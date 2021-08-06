@@ -19,15 +19,8 @@ const data = [
   },
 ];
 
-(function generateGraph() {
-  let dataWithTotal = [];
-
-  let filterdData = [...data].map((elm) => {
-    const { period, ...rest } = elm;
-    return rest;
-  });
-
-  dataWithTotal = filterdData.map((e) => {
+const calculateTotal = (array) =>
+  array.map((e) => {
     e.total =
       Object.values(e).reduce(
         (accumulator, currentValue) => (accumulator += currentValue),
@@ -36,10 +29,7 @@ const data = [
     return e;
   });
 
-  const labels = data.map((element) => element['period']);
-  let graphValues = [];
-  let keys = Object.keys(dataWithTotal[0]);
-
+const groupData = (keys, dataWithTotal) =>
   keys
     .filter((k) => k !== 'period')
     .map((k) => {
@@ -60,8 +50,21 @@ const data = [
         ],
       };
       temp.data = dataWithTotal.map((elt) => elt[k]);
-      graphValues.push(temp);
+      return temp;
     });
+
+(function generateGraph() {
+  let dataWithTotal = [];
+
+  let filterdData = [...data].map((elm) => {
+    const { period, ...rest } = elm;
+    return rest;
+  });
+
+  dataWithTotal = calculateTotal(filterdData);
+  const labels = data.map((element) => element['period']);
+  let keys = Object.keys(dataWithTotal[0]);
+  const graphValues = groupData(keys, dataWithTotal);
 
   const ctx = document.getElementById('myChart').getContext('2d');
   const myChart = new Chart(ctx, {
